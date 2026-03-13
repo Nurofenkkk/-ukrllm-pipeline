@@ -1,0 +1,9 @@
+requests>=2.31.0
+beautifulsoup4>=4.12.0
+markdownify>=0.11.6
+sqlalchemy>=1.4.36,<2.0
+psycopg2-binary>=2.9.0
+minio>=7.2.0
+pyyaml>=6.0
+loguru>=0.7.0
+lxml>=4.9.0

@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# IDE
+.idea/
+
+# Claude
+.claude/
+
+# Logs (keep .gitkeep)
+outputs/logs/*.log
+
+# Temp files
+outputs/tmp/*.json
+
+# Poetry virtualenv cache
+.python-version

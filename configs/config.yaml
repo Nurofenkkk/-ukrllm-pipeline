@@ -1,0 +1,15 @@
+api:
+  base_url: "https://data.rada.gov.ua"
+  token: "OpenData"
+  delay_min: 5
+  delay_max: 7
+  max_docs: 10
+
+database:
+  url: "postgresql://ukrllm_user:password123@127.0.0.1:5433/ukrllm_db"
+
+minio:
+  endpoint: "localhost:9000"
+  access_key: "minioadmin"
+  secret_key: "minioadmin123"
+  bucket: "documents"

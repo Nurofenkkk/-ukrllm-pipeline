@@ -1,0 +1,55 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: ukrllm_postgres
+    environment:
+      POSTGRES_DB: ukrllm_db
+      POSTGRES_USER: ukrllm_user
+      POSTGRES_PASSWORD: password123
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  minio:
+    image: minio/minio
+    container_name: ukrllm_minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin123
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+
+  airflow:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.airflow
+    container_name: ukrllm_airflow
+    depends_on:
+      - postgres
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://ukrllm_user:password123@postgres/ukrllm_db
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+      _AIRFLOW_WWW_USER_CREATE: "true"
+      _AIRFLOW_WWW_USER_USERNAME: admin
+      _AIRFLOW_WWW_USER_PASSWORD: admin
+    ports:
+      - "8080:8080"
+    volumes:
+      - ../dags:/opt/airflow/dags
+      - ../pipeline:/opt/airflow/pipeline
+      - ../configs:/opt/airflow/configs
+      - ../outputs:/opt/airflow/outputs
+    command: >
+      bash -c "airflow db migrate;
+               airflow users create -r Admin -u admin -p admin -f Admin -l Admin -e admin@example.com 2>/dev/null;
+               airflow webserver & airflow scheduler"
+
+volumes:
+  postgres_data:
+  minio_data:
