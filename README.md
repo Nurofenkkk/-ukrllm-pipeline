@@ -75,6 +75,8 @@ ukrllm-pipeline/
 ```bash
 # Check PostgreSQL
 docker exec -it ukrllm_postgres psql -U ukrllm_user -d ukrllm_db -c "SELECT nreg, nazva, status FROM documents;"
+# Check table in Dbeaver/pgadmin4
+SELECT nreg, nazva, doc_type, date_revision, status FROM documents; 
 
 # Check logs
 cat outputs/logs/pipeline.log
