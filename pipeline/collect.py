@@ -21,7 +21,7 @@ class RadaCollector:
         logger.info(f"Token: {self.token[:8]}...")
 
     def _get_fresh_token(self) -> str:
-        """Получить токен - только один раз при старте!"""
+        """Получить токен - только один раз при старте"""
         resp = requests.get(f"{self.BASE}/api/token")
         resp.raise_for_status()
         token = resp.json().get("token")
@@ -116,11 +116,11 @@ class RadaCollector:
         """Головний метод - збирає всі документи"""
         all_docs = []
 
-        # Шаг 1 - получаем список документов с метаданными
+        #получаем список документов с метаданными
         logger.info("Fetching updated documents list...")
         items = self.get_updated_list_tsv()
 
-        # Шаг 2 - для каждого документа получаем текст
+        #для каждого документа получаем текст
         for i, item in enumerate(items[:self.max_docs]):
             nreg = item.get("nreg")
             if not nreg:
