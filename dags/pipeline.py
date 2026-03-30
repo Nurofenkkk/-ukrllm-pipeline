@@ -79,7 +79,7 @@ def task_load(**ctx):
 
     DataLoader(config).save_all(docs)
 
-    # Чистим временные файлы этого запуска
+    # Clean up temporary files for this run
     for stage in ("collect", "transform", "quality"):
         p = _tmp_path(ctx["run_id"], stage)
         if os.path.exists(p):

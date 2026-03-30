@@ -15,13 +15,13 @@ class RadaCollector:
         self.delay_max = config["api"]["delay_max"]
         self.max_docs  = config["api"].get("max_docs", 50)
 
-        # Получаем токен ОДИН РАЗ при старте
+        # Get token once at startup
         self.token = self._get_fresh_token()
         self.headers = {"User-Agent": self.token}
         logger.info(f"Token: {self.token[:8]}...")
 
     def _get_fresh_token(self) -> str:
-        """Получить токен - только один раз при старте"""
+        """Get a fresh API token"""
         resp = requests.get(f"{self.BASE}/api/token")
         resp.raise_for_status()
         token = resp.json().get("token")
@@ -29,13 +29,13 @@ class RadaCollector:
         return token
 
     def _delay(self):
-        """Пауза 5-7 секунд между запросами"""
+        """Delay between requests to avoid rate limiting"""
         t = random.uniform(self.delay_min, self.delay_max)
         logger.debug(f"Sleeping {t:.1f}s...")
         time.sleep(t)
 
     def _get(self, url: str) -> requests.Response:
-        """GET с автоматическим обновлением токена при 401/403."""
+        """GET with automatic token refresh on 401/403."""
         resp = requests.get(url, headers=self.headers)
         if resp.status_code in (401, 403):
             logger.warning(f"Token rejected ({resp.status_code}), refreshing...")
@@ -48,7 +48,7 @@ class RadaCollector:
     @staticmethod
     def _parse_card(card: str) -> dict:
         """
-        Parse card field: 'Орган; Тип від ДД.ММ.РРРР'
+        Parse card field: 'Issuer; DocType від DD.MM.YYYY'
         Returns: issuer, doc_type, date_revision
         """
         result = {"issuer": "", "doc_type": "", "date_revision": ""}
@@ -67,15 +67,15 @@ class RadaCollector:
 
     def get_updated_list_tsv(self) -> list[dict]:
         """
-        Список поновлених документів з реквізитами у TSV форматі.
+        Fetch updated documents list with metadata in TSV format.
         URL: /laws/main/r.tsv
-        Поля: num, card, nazva, status, publics, link, size
+        Fields: num, card, nazva, status, publics, link, size
         """
         url = f"{self.BASE}/laws/main/r.tsv"
         resp = self._get(url)
         self._delay()
 
-        # Парсим TSV
+        # Parse TSV
         reader = csv.DictReader(
             io.StringIO(resp.text),
             delimiter="\t"
@@ -104,7 +104,7 @@ class RadaCollector:
 
     def get_document_text_html(self, nreg: str) -> str:
         """
-        Текст документа у HTML форматі.
+        Fetch document text in HTML format.
         URL: /laws/show/nreg
         """
         url = f"{self.BASE}/laws/show/{nreg}"
@@ -113,14 +113,14 @@ class RadaCollector:
         return resp.text
 
     def collect_all(self) -> list[dict]:
-        """Головний метод - збирає всі документи"""
+        """Main method - collect all documents"""
         all_docs = []
 
-        #получаем список документов с метаданными
+        # Fetch documents list with metadata
         logger.info("Fetching updated documents list...")
         items = self.get_updated_list_tsv()
 
-        #для каждого документа получаем текст
+        # Fetch text for each document
         for i, item in enumerate(items[:self.max_docs]):
             nreg = item.get("nreg")
             if not nreg:

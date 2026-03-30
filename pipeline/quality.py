@@ -8,27 +8,27 @@ class QualityChecker:
     def check(self, doc: dict) -> tuple[bool, list[str]]:
         errors = []
 
-        # Проверка ID
+        # Check document ID
         if not doc.get("nreg"):
-            errors.append("Нет nreg документа")
+            errors.append("Missing document nreg")
 
-        # Проверка названия - в TSV поле называется "nazva"
+        # Check title - in TSV the field is called "nazva"
         if not doc.get("nazva") and not doc.get("title") and not doc.get("name"):
-            errors.append("Нет названия документа")
+            errors.append("Missing document title")
 
-        # Проверка статуса
+        # Check status
         if not doc.get("status"):
-            errors.append("Нет статуса документа")
+            errors.append("Missing document status")
 
-        # Проверка текста
+        # Check text length
         text = doc.get("text_markdown", "")
         if len(text) < self.MIN_TEXT_LENGTH:
-            errors.append(f"Текст слишком короткий: {len(text)} символов")
+            errors.append(f"Text too short: {len(text)} chars")
 
-        # Проверка количества слов
+        # Check word count
         word_count = doc.get("word_count", 0)
         if word_count < self.MIN_WORD_COUNT:
-            errors.append(f"Мало слов: {word_count}")
+            errors.append(f"Too few words: {word_count}")
 
         is_valid = len(errors) == 0
 

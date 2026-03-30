@@ -62,7 +62,7 @@ class DataLoader:
             logger.info(f"Skipping duplicate: {nreg}")
             return
 
-        # Текст -> MinIO
+        # Text -> MinIO
         minio_path = f"documents/{nreg}.md"
         content = doc.get("text_markdown", "").encode("utf-8")
         self.minio.put_object(
@@ -71,7 +71,7 @@ class DataLoader:
             content_type="text/markdown"
         )
 
-        # Метаданные -> PostgreSQL
+        # Metadata -> PostgreSQL
         with self.engine.connect() as conn:
             conn.execute(text("""
                 INSERT INTO documents

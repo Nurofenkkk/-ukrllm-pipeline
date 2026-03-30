@@ -12,51 +12,51 @@ from pipeline.analyze import DataAnalyzer
 
 
 def main():
-    # Загружаем конфиг (локальный для запуска вне Docker)
+    # Load config (local config for running outside Docker)
     import os
     config_path = os.environ.get("PIPELINE_CONFIG", "configs/config.local.yaml")
     with open(config_path) as f:
         config = yaml.safe_load(f)
 
-    # Настройка логов
+    # Setup logging
     logger.add("outputs/logs/pipeline.log", rotation="10 MB")
 
     logger.info("=" * 50)
     logger.info("Starting UkrLLM Pipeline")
     logger.info("=" * 50)
 
-    # Инициализация компонентов
+    # Initialize components
     collector   = RadaCollector(config)
     transformer = DocumentTransformer()
     checker     = QualityChecker()
     loader      = DataLoader(config)
     analyzer    = DataAnalyzer(config)
 
-    # ШАГ 1 - Сбор данных
+    # Step 1 - Collect data
     logger.info("Step 1: Collecting documents...")
     documents = collector.collect_all()
     logger.info(f"Collected: {len(documents)} documents")
 
-    # ШАГ 2 - Трансформация HTML -> Markdown
+    # Step 2 - Transform HTML -> Markdown
     logger.info("Step 2: Transforming documents...")
     documents = transformer.transform_all(documents)
 
-    # ШАГ 3 - Проверка качества
+    # Step 3 - Quality check
     logger.info("Step 3: Quality check...")
     good_docs, bad_docs = checker.filter_all(documents)
     logger.info(f"Passed: {len(good_docs)}, Failed: {len(bad_docs)}")
 
-    # ШАГ 4 - Сохранение
+    # Step 4 - Save to storage
     logger.info("Step 4: Saving documents...")
     loader.save_all(good_docs)
 
-    # ШАГ 5 - Анализ данных
+    # Step 5 - Analyze data
     logger.info("Step 5: Analyzing data...")
     stats = analyzer.analyze()
     analyzer.save_report(stats)
     analyzer.save_dump()
 
-    # Итог
+    # Summary
     logger.info("=" * 50)
     logger.info(f"Pipeline complete!")
     logger.info(f"Total collected : {len(documents)}")
