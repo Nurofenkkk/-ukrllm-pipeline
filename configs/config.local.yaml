@@ -6,10 +6,10 @@ api:
   max_docs: 10
 
 database:
-  url: "postgresql://ukrllm_user:password123@postgres:5432/ukrllm_db"
+  url: "postgresql://ukrllm_user:password123@127.0.0.1:5433/ukrllm_db"
 
 minio:
-  endpoint: "minio:9000"
+  endpoint: "localhost:9000"
   access_key: "minioadmin"
   secret_key: "minioadmin123"
   bucket: "documents"

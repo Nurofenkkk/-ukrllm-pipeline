@@ -12,8 +12,10 @@ from pipeline.analyze import DataAnalyzer
 
 
 def main():
-    # Загружаем конфиг
-    with open("configs/config.yaml") as f:
+    # Загружаем конфиг (локальный для запуска вне Docker)
+    import os
+    config_path = os.environ.get("PIPELINE_CONFIG", "configs/config.local.yaml")
+    with open(config_path) as f:
         config = yaml.safe_load(f)
 
     # Настройка логов
