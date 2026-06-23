@@ -25,7 +25,7 @@ Wait ~60 seconds for Airflow to initialize.
 Edit `configs/config.local.yaml` for local runs, `configs/config.yaml` for Docker/Airflow:
 ```yaml
 api:
-  max_docs: 50  # number of documents to collect (524+ available)
+  max_docs: 10  # number of documents to collect (524+ available)
   delay_min: 5  # min delay between API requests (sec)
   delay_max: 7  # max delay between API requests (sec)
 ```
@@ -46,10 +46,9 @@ poetry run python scripts/001-run-pipeline-entrypoint.py
 ### Expected output
 ```
 Pipeline complete!
-Total collected : 44
-Quality passed  : 44
-Total in DB     : 44
-Total words     : 10674
+Total collected : 10
+Quality passed  : 10
+Total in DB     : 10
 ```
 
 ## Services
