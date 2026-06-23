@@ -62,8 +62,9 @@ class DataLoader:
             logger.info(f"Skipping duplicate: {nreg}")
             return
 
-        # Text -> MinIO
-        minio_path = f"documents/{nreg}.md"
+        # Text -> MinIO (sanitize nreg to avoid nested folders)
+        safe_nreg = nreg.replace("/", "-")
+        minio_path = f"documents/{safe_nreg}.md"
         content = doc.get("text_markdown", "").encode("utf-8")
         self.minio.put_object(
             self.bucket, minio_path,

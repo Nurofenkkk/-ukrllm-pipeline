@@ -1,4 +1,5 @@
 import re
+from bs4 import BeautifulSoup
 from markdownify import markdownify as md
 from loguru import logger
 
@@ -6,8 +7,21 @@ from loguru import logger
 class DocumentTransformer:
     def html_to_markdown(self, html: str) -> str:
         """Convert HTML to clean Markdown"""
+        # Pre-clean HTML with BeautifulSoup
+        soup = BeautifulSoup(html, "lxml")
+
+        # Remove non-content elements
+        for tag in soup.find_all(["script", "style", "nav", "header", "footer", "noscript"]):
+            tag.decompose()
+
+        # Remove image placeholders (empty images produce "[ image ]" in markdown)
+        for img in soup.find_all("img"):
+            img.decompose()
+
+        clean_html = str(soup)
+
         # Convert HTML -> Markdown
-        markdown = md(html, heading_style="ATX", strip=["script", "style"])
+        markdown = md(clean_html, heading_style="ATX")
 
         # Remove excessive blank lines (more than 2 in a row)
         markdown = re.sub(r'\n{3,}', '\n\n', markdown)

@@ -11,6 +11,16 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+  postgres-airflow:
+    image: postgres:15
+    container_name: ukrllm_airflow_postgres
+    environment:
+      POSTGRES_DB: airflow_db
+      POSTGRES_USER: airflow_user
+      POSTGRES_PASSWORD: airflow123
+    volumes:
+      - airflow_postgres_data:/var/lib/postgresql/data
+
   minio:
     image: minio/minio
     container_name: ukrllm_minio
@@ -31,9 +41,11 @@ services:
     container_name: ukrllm_airflow
     depends_on:
       - postgres
+      - postgres-airflow
+      - minio
     environment:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
-      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://ukrllm_user:password123@postgres/ukrllm_db
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow_user:airflow123@postgres-airflow/airflow_db
       AIRFLOW__CORE__LOAD_EXAMPLES: "false"
       _AIRFLOW_WWW_USER_CREATE: "true"
       _AIRFLOW_WWW_USER_USERNAME: admin
@@ -52,4 +64,5 @@ services:
 
 volumes:
   postgres_data:
+  airflow_postgres_data:
   minio_data:
